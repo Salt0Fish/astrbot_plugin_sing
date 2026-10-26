@@ -49,7 +49,7 @@ def pick_clip_start(total: float) -> float:
     return total * 0.25
 
 
-def main(kw: str, out_full: Path, out_clip: Path,
+def main(kw: str, out_orig: Path, out_full: Path, out_clip: Path,
          f0up: int = 0, index_rate: float = 0.75, protect: float = 0.33) -> None:
     WORK.mkdir(parents=True, exist_ok=True)
     got = fetch(kw, WORK)
@@ -59,6 +59,15 @@ def main(kw: str, out_full: Path, out_clip: Path,
     src = got["path"]
     total = float(got.get("dur") or 0)
     print(f"选中: {got['title']} - {got['artist']} [{got['source']}] {total:.0f}s", flush=True)
+
+    # 原版导出成 mp3（源可能是 m4a/mp3，统一转一次保证能直接播放）
+    out_orig.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run([FF, "-y", "-i", str(src), "-ar", "44100", "-b:a", "192k", str(out_orig)],
+                   capture_output=True)
+    if out_orig.exists():
+        print(f"原版输出: {out_orig}", flush=True)
+    else:
+        print("ORIG_FAIL", flush=True)
 
     wav_full = WORK / "src_full.wav"
     subprocess.run([FF, "-y", "-i", str(src), "-ar", "44100", "-ac", "2", str(wav_full)],
@@ -117,9 +126,10 @@ def main(kw: str, out_full: Path, out_clip: Path,
 
 if __name__ == "__main__":
     kw = sys.argv[1]
-    full = Path(sys.argv[2])
-    clip = Path(sys.argv[3])
-    f0 = int(sys.argv[4]) if len(sys.argv) > 4 else 0
-    ir = float(sys.argv[5]) if len(sys.argv) > 5 else 0.75
-    pr = float(sys.argv[6]) if len(sys.argv) > 6 else 0.33
-    main(kw, full, clip, f0, ir, pr)
+    orig = Path(sys.argv[2])
+    full = Path(sys.argv[3])
+    clip = Path(sys.argv[4])
+    f0 = int(sys.argv[5]) if len(sys.argv) > 5 else 0
+    ir = float(sys.argv[6]) if len(sys.argv) > 6 else 0.75
+    pr = float(sys.argv[7]) if len(sys.argv) > 7 else 0.33
+    main(kw, orig, full, clip, f0, ir, pr)
