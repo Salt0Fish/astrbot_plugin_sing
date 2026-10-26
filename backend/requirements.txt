@@ -1,0 +1,15 @@
+# 建议单独建一个 venv 装这些（Python 3.10~3.12）
+# Windows 上 fairseq 没有官方轮子，需要第三方编译版
+torch
+torchaudio
+fairseq
+rvc-python
+demucs
+soundfile
+librosa
+faiss-cpu
+praat-parselmouth
+torchcrepe
+pyworld
+numpy<2
+av
