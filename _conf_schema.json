@@ -1,0 +1,57 @@
+{
+  "scope": {
+    "type": "string",
+    "description": "只在这种会话里响应（FriendMessage=私聊）",
+    "default": "FriendMessage"
+  },
+  "rvc_python": {
+    "type": "string",
+    "description": "装了 RVC 环境（torch/fairseq/rvc-python/demucs）的 python.exe 路径",
+    "default": ""
+  },
+  "backend_dir": {
+    "type": "string",
+    "description": "backend 目录（cover.py 所在处），留空用插件自带的",
+    "default": ""
+  },
+  "rvc_model": {
+    "type": "string",
+    "description": "RVC 模型 .pth 路径（必须放在纯英文路径下）",
+    "default": ""
+  },
+  "rvc_index": {
+    "type": "string",
+    "description": "RVC 索引 .index 路径",
+    "default": ""
+  },
+  "ffmpeg_path": {
+    "type": "string",
+    "description": "ffmpeg 可执行文件路径",
+    "default": ""
+  },
+  "cache_dir": {
+    "type": "string",
+    "description": "翻唱结果缓存目录，留空用插件 data/cache",
+    "default": ""
+  },
+  "clip_seconds": {
+    "type": "int",
+    "description": "副歌片段长度（秒）",
+    "default": 45
+  },
+  "f0up_key": {
+    "type": "int",
+    "description": "整首升降调（半音），男声原唱可以 +2 试试",
+    "default": 0
+  },
+  "index_rate": {
+    "type": "float",
+    "description": "音色相似度，越高越像，太高会糊",
+    "default": 0.75
+  },
+  "protect": {
+    "type": "float",
+    "description": "清辅音保护，越低越像但容易出电子味",
+    "default": 0.33
+  }
+}
