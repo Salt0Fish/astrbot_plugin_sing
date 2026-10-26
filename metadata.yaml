@@ -2,5 +2,5 @@ name: astrbot_plugin_sing
 display_name: 唱歌
 desc: 说"想听你唱歌"，用本地 RVC 模型把整首歌翻唱成她的音色，先发整首 mp3，再发一段副歌语音条。
 version: v1.1.0
-author: Guzzer
+author: Salt0Fish
 repo: https://github.com/Salt0Fish/astrbot_plugin_sing
