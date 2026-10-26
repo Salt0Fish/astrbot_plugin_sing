@@ -120,10 +120,11 @@ class Main(star.Star):
         try:
             key = hashlib.md5(f"{song}|{f0}|{ir}".encode()).hexdigest()[:16]
             cache = _cache_dir()
+            orig = cache / f"{key}_orig.mp3"
             full = cache / f"{key}_full.mp3"
             clip = cache / f"{key}_clip.wav"
-            if full.exists() and clip.exists():
-                await self._send(umo, full, clip, song, cached=True)
+            if orig.exists() and full.exists() and clip.exists():
+                await self._send(umo, orig, full, clip, song, cached=True)
                 return
 
             import os as _os
@@ -152,15 +153,15 @@ class Main(star.Star):
                 Path(env["TORCH_HOME"]).parent.joinpath(d).mkdir(parents=True, exist_ok=True)
 
             proc = await asyncio.create_subprocess_exec(
-                rvc_python, "-u", cover, song, str(full), str(clip), str(f0), str(ir), str(pr),
+                rvc_python, "-u", cover, song, str(orig), str(full), str(clip), str(f0), str(ir), str(pr),
                 stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT, env=env,
             )
             stdout, _ = await proc.communicate()
             log = (stdout or b"").decode("utf-8", "replace")
             logger.info(f"[sing] {song} 结束 rc={proc.returncode} {log[-200:]}")
 
-            if full.exists() and clip.exists():
-                await self._send(umo, full, clip, song)
+            if orig.exists() and full.exists() and clip.exists():
+                await self._send(umo, orig, full, clip, song)
             elif "NOT_FOUND" in log:
                 await self._say(umo, "对方点的歌你没找到，跟他说一声", FAIL_POOL)
             else:
@@ -176,9 +177,16 @@ class Main(star.Star):
         if line:
             await self.context.send_message(umo, self._chain(line))
 
-    async def _send(self, umo: str, full: Path, clip: Path, song: str, cached: bool = False) -> None:
-        intro = await self._line(umo, f"你唱完了《{song}》，说一句把整首发给他",
-                                 ["整首也给你", "整首发你啦", "完整版在这"])
+    async def _send(self, umo: str, orig: Path, full: Path, clip: Path,
+                    song: str, cached: bool = False) -> None:
+        # 1) 先发原版
+        ochain = self._chain("")
+        ochain.chain = [File(name=f"{song}_原版.mp3", file=str(orig))]
+        await self.context.send_message(umo, ochain)
+
+        # 2) 再发她唱的整首
+        intro = await self._line(umo, f"你把《{song}》唱完了，说一句把整首发给他",
+                                 ["整首也给你", "我唱的在这", "完整版在这"])
         if intro:
             await self.context.send_message(umo, self._chain(intro))
 
